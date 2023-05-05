@@ -114,7 +114,7 @@ function pageDown() {
         <h2 id="topTitle">{{ data.nav }}</h2>
     </div>
     <div class="home" v-show="data.nav === Route.Home">
-        <input v-model="input"/>
+        <input v-model="input"  v-on:keydown.enter="loadVideos"/>
         <button @click="loadVideos">搜索</button>
         <div id="body">
             <h3 v-show="data.videos.length === 0">没有数据</h3>
