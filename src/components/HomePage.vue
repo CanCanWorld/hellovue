@@ -1,6 +1,8 @@
 <template>
-    <input v-model="input" v-on:keydown.enter="loadVideos"/>
-    <button @click="loadVideos">搜索</button>
+    <div id="search">
+        <input v-model="input" v-on:keydown.enter="loadVideos"/>
+        <button @click="loadVideos" id="BtSearch">搜索</button>
+    </div>
     <div id="body">
         <h3 v-show="videos.length === 0">没有数据</h3>
         <div v-for="item in videos" @click="videoClick(item)">
@@ -15,8 +17,8 @@
         </div>
     </div>
     <div id="pageBox">
-        <h3 v-show="page !== 1" @click="pageUp">上一页</h3>
-        <h3 @click="pageDown">下一页</h3>
+        <button v-show="page !== 1" @click="pageUp" id="pageup">上一页</button>
+        <button @click="pageDown" id="pagelater">下一页</button>
     </div>
 </template>
 
@@ -100,7 +102,7 @@ export default {
 
 #title {
     position: absolute;
-    top: 50%;
+    top: 10%;
     left: 50%;
     transform: translate(-50%, -50%);
     font-weight: bold;
@@ -108,9 +110,11 @@ export default {
 
 #pageBox {
     width: 100%;
-    display: flex;
+    /* display: flex; */
     align-items: center;
     justify-items: center;
+    text-align: center;
+    margin-top: 10px;
 }
 
 #body {
@@ -121,5 +125,22 @@ export default {
     grid-auto-rows: 400px;
     justify-content: center;
     align-content: center;
+}
+#pageup{
+    margin: 10px;
+}
+#pageup:hover,#pagelater:hover{
+    color: red;
+    background-color: green;
+}
+#search{
+    float: right;
+}
+#BtSearch{
+    margin: 5px;
+    font-weight: 700;
+}
+#BtSearch:hover{
+    background-color: #a7dfff;
 }
 </style>
