@@ -3,39 +3,81 @@
 import {reactive, ref} from "vue";
 import API from "@/plugins/axiosInstance";
 import MyPlayer from "./components/MyPlayer.vue";
-
+//导航标题
 const Route = {
     Home: "主页",
     Chapter: "章节",
     Play: "播放页",
 };
-
-const input = ref("")
-
+//绑定的数据集
 const data = reactive({
-    list: [],
-    nav: Route.Home
+    //视频列表
+    videos: [],
+    //章节列表
+    chapters: [],
+    //当前导航
+    nav: Route.Home,
+    //当前页数
+    page: 1
 })
-
+//输入框内容
+const input = ref("")
+//选中视频id
 const videoId = ref("")
+//选中章节id
+const chapterPath = ref("")
 
-function getData() {
-    console.log(input.value);
+// methods
+//加载视频
+function loadVideos() {
+    console.log("input: " + input.value);
+    console.log("page: " + data.page);
     API({
-        url: "/video/search/title/" + input.value + "/1/30",
+        url: "/video/search/title/" + input.value + "/" + data.page + "/30",
         method: "get",
     }).then((res) => {
-        data.list = res.data.data
-        console.log(data.list);
+        console.log("loadVideos result: " + res)
+        if (res.data.data === null) {
+            data.videos = []
+        }else {
+            data.videos = res.data.data
+        }
+        console.log(data.videos);
     });
 }
 
-function itemClick(item) {
+//加载章节
+function loadChapter() {
+    API({
+        url: "/videoChapter/search/" + videoId.value,
+        method: "get",
+    }).then((res) => {
+        console.log(res)
+        if (res.data.data.chapterList === null) {
+            data.chapters = []
+        }else {
+            data.chapters = res.data.data.chapterList
+        }
+        console.log("chapter:" + data.chapters);
+    });
+}
+
+//视频点击
+function videoClick(item) {
     console.log(item.videoId)
     videoId.value = item.videoId
     data.nav = Route.Chapter
+    loadChapter()
 }
 
+//章节点击
+function chapterClick(item) {
+    console.log(item.chapterPath)
+    chapterPath.value = item.chapterPath
+    data.nav = Route.Play
+}
+
+//返回
 function onBackClick() {
     console.log("back")
     switch (data.nav) {
@@ -50,35 +92,59 @@ function onBackClick() {
     }
 }
 
+//上一页
+function pageUp() {
+    data.page--
+    loadVideos()
+    window.scrollTo(0, 0);
+}
+
+//下一页
+function pageDown() {
+    data.page++
+    window.scrollTo(0, 0);
+    loadVideos()
+}
+
 </script>
 
 <template>
     <div id="topBar">
-
         <img v-show="data.nav !== Route.Home" id="icon" src="../src/assets/icon_back.png" @click="onBackClick">
         <h2 id="topTitle">{{ data.nav }}</h2>
     </div>
-    <div v-show="data.nav === Route.Home">
+    <div class="home" v-show="data.nav === Route.Home">
         <input v-model="input"/>
-        <button @click="getData">搜索</button>
+        <button @click="loadVideos">搜索</button>
         <div id="body">
-            <div v-for="item in data.list" @click="itemClick(item)">
+            <h3 v-show="data.videos.length === 0">没有数据</h3>
+            <div v-for="item in data.videos" @click="videoClick(item)">
                 <div id="itemBox">
                     <div id="imgCover" v-bind:style="item.cover">
                         <img :src="item.cover">
                     </div>
                     <div id="itemTitle">
-                    <h3 id="title">{{ item.title }}</h3>
+                        <h3 id="title">{{ item.title }}</h3>
                     </div>
                 </div>
             </div>
         </div>
+        <div id="pageBox">
+            <h3 v-show="data.page !== 1" @click="pageUp">上一页</h3>
+            <h3 @click="pageDown">下一页</h3>
+        </div>
     </div>
-    <div v-show="data.nav === Route.Chapter">
-        <p>Chapter</p>
+    <div class="home" v-show="data.nav === Route.Chapter">
+        <div id="chapterBody">
+            <div v-for="item in data.chapters" @click="chapterClick(item)">
+                <div id="chapterBox">
+                    {{ item.title }}
+                </div>
+            </div>
+        </div>
     </div>
-    <div v-show="data.nav === Route.Play">
-        <MyPlayer :path="videoId"/>
+    <div class="home" v-show="data.nav === Route.Play">
+        <MyPlayer :path="chapterPath"/>
     </div>
 </template>
 
@@ -92,6 +158,11 @@ ul {
     margin: 0;
 }
 
+.home {
+    width: 100%;
+    top: 10%;
+    position: absolute;
+}
 
 #itemBox {
     background-color: #a7dfff;
@@ -105,12 +176,12 @@ ul {
     background-color: bisque;
 }
 
-#imgCover img{
+#imgCover img {
     width: 100%;
     height: 100%;
 }
 
-#itemTitle{
+#itemTitle {
     height: 20%;
     position: relative;
 }
@@ -125,10 +196,9 @@ ul {
 
 #topBar {
     width: 100%;
-    display: flex;
-    height: 30px;
+    height: 10%;
     align-items: center;
-    position: relative;
+    position: absolute;
     background-color: bisque;
 }
 
@@ -141,17 +211,45 @@ ul {
 }
 
 #icon {
+    position: absolute;
+    top: 50%;
+    transform: translate(0%, -50%);
     margin-left: 10px;
-    height: 60%;
+    height: 70%;
+}
+
+#pageBox {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-items: center;
 }
 
 #body {
-    background-color: aqua;
+    width: 100%;
     height: auto;
     display: grid;
     grid-template-columns: repeat(auto-fill, 300px);
     grid-auto-rows: 400px;
     justify-content: center;
     align-content: center;
+}
+
+#chapterBody {
+    width: 100%;
+    height: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 150px);
+    grid-auto-rows: 50px;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+    justify-items: center;
+}
+
+#chapterBox {
+    background-color: #a7dfff;
+    height: 40%;
+    padding: 10px 20px 10px 20px;
 }
 </style>

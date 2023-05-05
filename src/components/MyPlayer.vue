@@ -1,4 +1,3 @@
-
 <template>
     <div ref="videoRef"></div>
 </template>
@@ -6,7 +5,7 @@
 <script setup>
 import DPlayer from 'dplayer'
 import Hls from 'hls.js';
-import { ref, reactive, onBeforeUnmount, onMounted } from 'vue'
+import {ref, reactive, onBeforeUnmount, onMounted, onUpdated} from 'vue'
 
 const videoRef = ref()
 const state = reactive({
@@ -16,7 +15,8 @@ const state = reactive({
 const props = defineProps({
     path: ""
 })
-onMounted(() => {
+onUpdated(() => {
+    console.log("onMounted: " + props.path)
     let player = {
         container: videoRef.value,
         autoplay: false,
