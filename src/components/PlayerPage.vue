@@ -5,17 +5,18 @@
 <script setup>
 import DPlayer from 'dplayer'
 import Hls from 'hls.js';
-import {ref, reactive, onBeforeUnmount, onMounted, onUpdated} from 'vue'
+import {ref, reactive, onBeforeUnmount, watch} from 'vue'
 
 const videoRef = ref()
 const state = reactive({
     instance: null
 })
 
-const props = defineProps({
-    path: ""
-})
-onUpdated(() => {
+const props = defineProps([
+    "path"
+])
+
+watch(() => props.path, () => {
     console.log("onMounted: " + props.path)
     let player = {
         container: videoRef.value,
@@ -33,7 +34,7 @@ onUpdated(() => {
             url: props.path, //视频地址
             type: 'customHls',
             customType: {
-                customHls: function (video, player) {
+                customHls: function (video) {
                     const hls = new Hls(); //实例化Hls  用于解析m3u8
                     hls.loadSource(video.src);
                     hls.attachMedia(video);
@@ -49,10 +50,8 @@ onUpdated(() => {
 })
 // 销毁
 onBeforeUnmount(() => {
-    state.instance.destroy()
+    state.instance?.destroy()
 })
-
-
 </script>
 
 <style lang='scss' scoped>
