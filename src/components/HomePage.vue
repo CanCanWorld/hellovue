@@ -1,10 +1,6 @@
 <template>
-    <div id="search">
-        <input v-model="input" v-on:keydown.enter="loadVideos"/>
-        <button @click="loadVideos" id="BtSearch">搜索</button>
-    </div>
     <div id="body">
-        <h3 v-show="videos.length === 0">没有数据</h3>
+        <h3 v-show="videos.length === 0">{{ loadTip }}</h3>
         <div v-for="item in videos" @click="videoClick(item)">
             <div id="itemBox">
                 <div id="imgCover" v-bind:style="item.cover">
@@ -24,52 +20,27 @@
 
 <script>
 
-import API from "../plugins/axiosInstance";
 import Route from "../plugins/Route";
 
 export default {
-    props: [],
-    emits: ["navTo", "vidChanged"],
+    props: ["page", "videos", "loadTip"],
+    emits: ["navChanged", "vidChanged", "pageChanged"],
     data() {
-        return {
-            //当前页数
-            page: 0,
-            //视频列表
-            videos: [],
-            //输入框内容
-            input: "",
-        }
+        return {}
     },
+
     methods: {
         //上一页
         pageUp() {
-            this.page--
-            window.scrollTo(0, 0);
-            this.loadVideos()
+            this.$emit("pageChanged", this.page - 1)
         },
         //下一页
         pageDown() {
-            this.page++
-            window.scrollTo(0, 0);
-        },
-        //加载视频
-        loadVideos() {
-            API({
-                url: "/video/search/title/" + this.input + "/" + this.page + "/30",
-                method: "get",
-            }).then((res) => {
-                console.log("loadVideos result: " + res)
-                if (res?.data?.data == null) {
-                    this.videos = []
-                } else {
-                    this.videos = res.data.data
-                }
-                console.log(this.videos);
-            });
+            this.$emit("pageChanged", this.page + 1)
         },
         //视频点击
         videoClick(item) {
-            this.$emit("navTo", Route.Chapter)
+            this.$emit("navChanged", Route.Chapter)
             this.$emit("vidChanged", item.videoId)
         }
     }
@@ -126,21 +97,13 @@ export default {
     justify-content: center;
     align-content: center;
 }
-#pageup{
+
+#pageup {
     margin: 10px;
 }
-#pageup:hover,#pagelater:hover{
+
+#pageup:hover, #pagelater:hover {
     color: red;
     background-color: green;
-}
-#search{
-    float: right;
-}
-#BtSearch{
-    margin: 5px;
-    font-weight: 700;
-}
-#BtSearch:hover{
-    background-color: #a7dfff;
 }
 </style>

@@ -17,7 +17,7 @@ import Route from "../plugins/Route";
 
 export default {
     props: ["vid"],
-    emits: ["navTo", "pathChanged"],
+    emits: ["navChanged", "pathChanged"],
     data() {
         return {
             //章节列表
@@ -51,7 +51,7 @@ export default {
         //章节点击
         chapterClick(item) {
             console.log(item.chapterPath)
-            this.$emit("navTo", Route.Play)
+            this.$emit("navChanged", Route.Play)
             this.$emit("pathChanged", item.chapterPath)
         }
     }

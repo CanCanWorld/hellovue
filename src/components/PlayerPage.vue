@@ -6,6 +6,7 @@
 import DPlayer from 'dplayer'
 import Hls from 'hls.js';
 import {ref, reactive, onBeforeUnmount, watch} from 'vue'
+import Route from "../plugins/Route";
 
 const videoRef = ref()
 const state = reactive({
@@ -13,8 +14,15 @@ const state = reactive({
 })
 
 const props = defineProps([
-    "path"
+    "path", "nav"
 ])
+
+watch(() => props.nav, (nav) => {
+    console.log("nav:" + nav)
+    if (nav !== Route.Play){
+        state.instance?.destroy()
+    }
+})
 
 watch(() => props.path, () => {
     console.log("onMounted: " + props.path)
