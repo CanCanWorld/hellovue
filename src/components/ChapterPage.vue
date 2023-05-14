@@ -1,12 +1,17 @@
 <template>
 
   <!--    todo:添加详情卡片       -->
-    <div id="chapterBody">
-        <div v-for="item in chapters" @click="chapterClick(item)">
-            <div id="chapterBox">
-                {{ item.title }}
-            </div>
-        </div>
+    <div id="body">
+        <el-row>
+            <el-col :span="4" v-for="item in chapters ">
+                <el-card id="card"
+                        :body-style="{ padding : '10px'}"
+                        shadow="hover"
+                        @click="chapterClick(item)">
+                    <p id="title">{{ item.title }}</p>
+                </el-card>
+            </el-col>
+        </el-row>
     </div>
 </template>
 
@@ -60,21 +65,26 @@ export default {
 </script>
 
 <style scoped>
-#chapterBody {
+#body {
     width: 100%;
     height: auto;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, 150px);
-    grid-auto-rows: 50px;
-    justify-content: center;
-    align-content: center;
-    align-items: center;
-    justify-items: center;
 }
 
-#chapterBox {
-    background-color: #a7dfff;
-    height: 40%;
-    padding: 10px 20px 10px 20px;
+.el-col {
+    background-color: #be98aa;
+}
+
+#title {
+    padding: 5px;
+    margin: 0;
+}
+
+#card {
+    margin: 10px;
+    display: flex;
+    /*水平居中*/
+    justify-content: center;
+    /*垂直居中*/
+    align-items: center;
 }
 </style>

@@ -4,17 +4,20 @@ import Route from "./plugins/Route";
 import HomePage from "./components/HomePage.vue";
 import ChapterPage from "./components/ChapterPage.vue";
 import PlayerPage from "./components/PlayerPage.vue";
-import TopBarWidget from "./components/TopBarWidget.vue";
 import API from "./plugins/axiosInstance";
 import LoadTip from "./plugins/LoadTip";
+import {Search} from "@element-plus/icons-vue";
 
 export default {
     computed: {
+        Search() {
+            return Search
+        },
         Route() {
             return Route
         }
     },
-    components: {TopBarWidget, PlayerPage, ChapterPage, HomePage},
+    components: {PlayerPage, ChapterPage, HomePage},
     data() {
         return {
             //当前导航
@@ -30,7 +33,8 @@ export default {
             //输入框内容
             input: "",
             //加载提示
-            loadTip: LoadTip.Blank
+            loadTip: LoadTip.Blank,
+            showBottom: false,
         }
     },
     watch: {
@@ -42,8 +46,7 @@ export default {
     },
     methods: {
         //加载视频
-        loadVideos(input) {
-            this.input = input
+        loadVideos() {
             this.loadTip = LoadTip.Loading
             this.nav = Route.Home
             this.videos = []
@@ -56,6 +59,7 @@ export default {
                 console.log("loadVideos result: " + res)
                 if (res?.data?.data != null) {
                     this.videos = res.data.data
+                    this.showBottom = true
                 } else {
                     this.loadTip = LoadTip.Error
                 }
@@ -63,7 +67,7 @@ export default {
             });
         },
         //跳转
-        navChanged(target) {	
+        navChanged(target) {
             this.nav = target
         },
         vidChanged(vid) {
@@ -81,19 +85,45 @@ export default {
 </script>
 
 <template>
-    <div id="topBar">
-        <TopBarWidget @loadVideos="loadVideos"/>
-    </div>
+
+    <el-affix>
+        <div id="header">
+            <el-input
+                    placeholder="请输入关键字"
+                    v-model="input"
+                    v-on:keydown.enter="loadVideos()">
+                <template #prepend>
+                    <el-button :icon="Search"/>
+                </template>
+                <template #append>
+                    <el-button @click="loadVideos()">
+                        搜索
+                    </el-button>
+                </template>
+            </el-input>
+        </div>
+    </el-affix>
     <div class="page" v-show="nav === Route.Home">
-        <HomePage :page="page" :videos="videos" :loadTip="loadTip" @pageChanged="pageChanged" @navChanged="navChanged"
-                  @vidChanged="vidChanged"/>
+        <HomePage
+                :page="page"
+                :videos="videos"
+                :loadTip="loadTip"
+                :showBottom="showBottom"
+                @pageChanged="pageChanged"
+                @navChanged="navChanged"
+                @vidChanged="vidChanged"/>
     </div>
     <div class="page">
         <div v-show="nav === Route.Play">
-            <PlayerPage :path="chapterPath" :nav="nav"/>
+            <PlayerPage
+                    :path="chapterPath"
+                    :nav="nav"/>
         </div>
         <div v-show="nav !== Route.Home">
-            <ChapterPage :vid="videoId" @navChanged="navChanged" @pathChanged="pathChanged"/>
+            <ChapterPage
+                    :vid="videoId"
+                    @navChanged="navChanged"
+                    @pathChanged="pathChanged"/>
         </div>
     </div>
 </template>
@@ -101,23 +131,25 @@ export default {
 
 <style scoped>
 
-* {
+body {
     padding: 0;
     margin: 0;
 }
 
 .page {
     width: 100%;
-    top: 10%;
-    position: absolute;
 }
 
-#topBar {
-    width: 100%;
-    height: 8%;
+#header {
+    height: 52px;
+    padding: 0 10%;
+    background-color: #3e3f4c;
+    /*flex布局*/
+    display: flex;
+    /*水平居中*/
+    justify-content: center;
+    /*垂直居中*/
     align-items: center;
-    position: absolute;
-    background-color: bisque;
 }
 
 </style>

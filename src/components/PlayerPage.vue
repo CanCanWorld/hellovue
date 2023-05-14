@@ -37,7 +37,6 @@ watch(() => props.path, () => {
         preload: 'auto',
         volume: 0.7,
         playbackSpeed: [0.5, 0.75, 1, 1.25, 1.5, 2],
-        logo: 'http://jiuaibuni.top/wp-content/uploads/2020/12/logo.png',
         video: {
             url: props.path, //视频地址
             type: 'customHls',
