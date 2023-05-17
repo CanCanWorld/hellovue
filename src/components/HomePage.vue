@@ -1,5 +1,6 @@
 <template>
     <div id="body">
+        test
         <h3 v-show="videos.length === 0">{{ loadTip }}</h3>
         <el-row>
             <el-col :span="6" v-for="item in videos">
