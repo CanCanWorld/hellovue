@@ -8,6 +8,7 @@
                         :body-style="{ padding : '10px', backgroundColor:'#3e3f4c'}"
                         shadow="hover"
                         @click="videoClick(item)">
+                    <p>test</p>
                     <el-image style="width: 100% ;height: 100% "
                               :src="item.cover"
                               :fit="'cover'"/>
